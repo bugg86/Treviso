@@ -16,8 +16,4 @@
       <ProjectReference Include="..\Domain\oTSPA.Domain.Mongo\oTSPA.Domain.Mongo.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\Interfaces\" />
-    </ItemGroup>
-
 </Project>

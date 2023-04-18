@@ -1,5 +1,4 @@
-﻿using oTSPA.Domain.Mongo.Models.Interfaces;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+﻿using oTSPA.Domain.Mongo.Repositories.Interfaces;
 
 namespace REST.Controllers;
 
