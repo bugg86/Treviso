@@ -1,6 +1,15 @@
+using oTSPA.Domain.Mongo.Models;
+using oTSPA.Domain.Mongo.Repositories;
+using oTSPA.Domain.Mongo.Repositories.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<MongoSettings>(
+    builder.Configuration.GetSection("MongoDB"));
+
+//Add repositories
+builder.Services.AddScoped(typeof(ITournamentRepository), typeof(TournamentRepository));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
