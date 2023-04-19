@@ -16,6 +16,7 @@
 # Local Settings
 appsettings.json
 appsettings.Development.json
+bot_token
 
 # Mono auto generated files
 mono_crash.*
