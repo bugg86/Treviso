@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oTSPA.AppService.Tests.REST
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REST", "REST\REST.csproj", "{79293E91-9AAF-4F01-A2F6-65BCC18405B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "Bot\Bot.csproj", "{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{79293E91-9AAF-4F01-A2F6-65BCC18405B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79293E91-9AAF-4F01-A2F6-65BCC18405B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79293E91-9AAF-4F01-A2F6-65BCC18405B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{55F77F7A-3B91-4B45-A419-E2F04CAFD081} = {4F0A5B4C-953F-43C3-BF9C-02EBE8FD56D3}
