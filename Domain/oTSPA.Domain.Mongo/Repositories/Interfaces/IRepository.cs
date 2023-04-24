@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using oTSPA.Domain.Mongo.Models;
 using oTSPA.Domain.Mongo.Models.Interfaces;
 
 namespace oTSPA.Domain.Mongo.Repositories.Interfaces;
@@ -7,8 +8,7 @@ public interface IRepository<TDocument> where TDocument : IDocument
 {
     IQueryable<TDocument> AsQueryable();
 
-    IEnumerable<TDocument> FilterBy(
-        Expression<Func<TDocument, bool>> filterExpression);
+    IEnumerable<TDocument> FilterBy(Expression<Func<TDocument, bool>> filterExpression);
 
     IEnumerable<TProjected> FilterBy<TProjected>(
         Expression<Func<TDocument, bool>> filterExpression,
