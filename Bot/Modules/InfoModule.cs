@@ -6,17 +6,11 @@ namespace Bot.Modules;
 
 public class InfoModule : InteractionModuleBase<SocketInteractionContext>
 {
-    public InteractionService Commands { get; set; }
+    public InteractionService Commands { get; set; } = null!;
     public CommandHandler _handler;
 
     public InfoModule(CommandHandler handler)
     {
         _handler = handler;
-    }
-
-    [SlashCommand("test", "test description")]
-    public async Task TestCommand(string testField)
-    {
-        await RespondAsync($"here's what you entered: {testField}");
     }
 }

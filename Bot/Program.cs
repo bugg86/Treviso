@@ -16,7 +16,7 @@ namespace Bot;
 public class Program
 {
     private DiscordSocketClient? _client;
-    private InteractionService _commands;
+    private InteractionService _commands = null!;
     
     public static Task Main(string[] args) => new Program().MainAsync();
 
@@ -66,16 +66,16 @@ public class Program
         return Task.CompletedTask;
     }
 }
-public static class DBConnection
+public static class DbConnection
 {
-    private static IConfiguration config;
+    private static IConfiguration _config = null!;
     public static IConfiguration Configuration {
         get {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
-            config = builder.Build();
-            return config;
+            _config = builder.Build();
+            return _config;
         }
     }
 }

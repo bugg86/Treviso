@@ -11,7 +11,7 @@ namespace Bot.Modules;
 [Group("tournament", "commands for managing tournament")]
 public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
 {
-    public InteractionService Commands { get; set; }
+    public InteractionService Commands { get; set; } = null!;
     public CommandHandler _handler;
     private readonly ITournamentRepository _tournamentRepository;
 
