@@ -2,9 +2,14 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using oTSPA.Domain.Mongo.Models;
+using oTSPA.Domain.Mongo.Models.Interfaces;
 using oTSPA.Domain.Mongo.Repositories;
 using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using ConfigurationSection = Microsoft.Extensions.Configuration.ConfigurationSection;
 
 namespace Bot;
 
@@ -21,7 +26,7 @@ public class Program
         
         _client = services.GetRequiredService<DiscordSocketClient>();
         _commands = services.GetRequiredService<InteractionService>();
-        
+
         _client.Log += Log;
         _commands.Log += Log;
         _client.Ready += ReadyAsync;
@@ -45,18 +50,32 @@ public class Program
     private ServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        
+
         services.AddSingleton<DiscordSocketClient>();
         services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddScoped<ITournamentRepository, TournamentRepository>();
+        services.AddScoped<IMongoSettings, MongoSettings>();
 
         return services.BuildServiceProvider();
     }
-    
+
     private Task Log(LogMessage msg)
     {
         Console.WriteLine(msg.ToString());
         return Task.CompletedTask;
+    }
+}
+public static class DBConnection
+{
+    private static IConfiguration config;
+    public static IConfiguration Configuration {
+        get {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+            config = builder.Build();
+            return config;
+        }
     }
 }

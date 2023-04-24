@@ -12,5 +12,8 @@ public class Tournament : Document
     public string Name { get; set; }
     public string RangeLower { get; set; }
     public string RangeUpper { get; set; }
+    public int TeamSize { get; set; }
+    public string Vs { get; set; }
+    public ulong User { get; set; }
     public int Version { get; set; }
 }
