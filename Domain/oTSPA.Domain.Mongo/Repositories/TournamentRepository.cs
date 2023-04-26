@@ -7,8 +7,6 @@ namespace oTSPA.Domain.Mongo.Repositories;
 
 public class TournamentRepository : Repository<Tournament>, ITournamentRepository
 {
-    private readonly IMongoCollection<Tournament> _collection;
-    
     public TournamentRepository(IMongoSettings settings) : base(settings)
     {
         
