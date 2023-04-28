@@ -18,6 +18,8 @@ public class Match : Document
     public string? StreamerDiscord { get; set; }
     public string? Commentator1 { get; set; } //Discord user
     public string? Commentator2 { get; set; } //Discord user
+    public bool PingSent { get; set; }
+    public bool MatchFinished { get; set; }
     public ulong User { get; set; } //Discord user id of who created the db entry
     public int Version { get; set; } //Model version
 }

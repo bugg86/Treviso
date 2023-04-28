@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Domain\oTSPA.Domain.Mongo\oTSPA.Domain.Mongo.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Discord.Net.Webhook" Version="3.10.0" />
+    </ItemGroup>
+
+</Project>

@@ -1,7 +1,6 @@
 ﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using oTSPA.Domain.Mongo.Models;
 using oTSPA.Domain.Mongo.Repositories.Interfaces;
 
@@ -52,6 +51,8 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             StreamerDiscord = streamerDiscord,
             Commentator1 = commentator1,
             Commentator2 = commentator2,
+            PingSent = false,
+            MatchFinished = false,
             User = Context.User.Id,
             Version = 1
         };
