@@ -1,10 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using Bot.Handlers;
+﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Repositories;
 using oTSPA.Domain.Mongo.Repositories.Interfaces;
 
 namespace Bot.Modules;
@@ -36,8 +33,8 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
             Vs = vs,
             RangeLower = rangeLower,
             RangeUpper = rangeUpper,
-            Version = 1,
-            User = Context.User.Id
+            User = Context.User.Id,
+            Version = 1
         };
 
         try
@@ -47,7 +44,7 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
 
             if (tournaments.Count != 0)
             {
-                await RespondAsync(embed: TournamentWarning(tournaments, abbreviation));
+                await RespondAsync(embed: TournamentCreationWarning(tournaments, abbreviation));
                 
                 await _tournamentRepository.InsertOneAsync(newTournament);
             }
@@ -55,54 +52,13 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
             {
                 await _tournamentRepository.InsertOneAsync(newTournament);
 
-                await RespondAsync(embed: TournamentSucces());
+                await RespondAsync(embed: TournamentCreationSuccess());
             }
         }
         catch (Exception ex)
         {
-            await RespondAsync(embed: TournamentFail(ex));
+            await RespondAsync(embed: TournamentCreationFail(ex));
         }
-    }
-
-    private static Embed TournamentFail(Exception ex)
-    {
-        return new EmbedBuilder()
-        {
-            Title = $"Your tournament could not be added with the following exception: {ex.Message.ToString()}",
-            Color = Color.Red
-        }.WithCurrentTimestamp().Build();
-    }
-    private static Embed TournamentSucces()
-    {
-        return new EmbedBuilder()
-        {
-            Title = "Your tournament was successfully added to the database.", 
-            Color = Color.Green
-        }.WithCurrentTimestamp().Build();
-    }
-
-    private static Embed TournamentWarning(IReadOnlyCollection<Tournament> tournaments, string abbreviation)
-    {
-        var embed = new EmbedBuilder()
-        {
-            Description = "Your tournament was added but others were found with this abbreviation.",
-            Color = Color.Gold
-        }.WithCurrentTimestamp();
-        
-        for (var i = 0; i < tournaments.Count; i++)
-        {
-            embed.AddField($"Tournaments found with abbreviation: {abbreviation}", $"**{(i+1).ToString()}:** {tournaments.ElementAt(i).Name}", true);
-            if (i != 0)
-            {
-                embed.Fields.ElementAt(0).Value = string.Concat(embed.Fields.ElementAt(0).Value, $"\n, **{(i + 1).ToString()}:** {tournaments.ElementAt(i).Name}");
-            }
-            if (embed.Fields.Count > 5 && embed.Fields.Count != tournaments.Count)
-            {
-                embed.AddField("Too many tournaments: ", $" {tournaments.Count - embed.Fields.Count} more tournaments were found...", true);
-            }
-        }
-        
-        return embed.Build();
     }
 
     [SlashCommand("remove", "removes a tournament from the database")]
@@ -125,8 +81,47 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
             catch (Exception ex)
             {
                 await RespondAsync(
-                    $"Your tournament could not be added with the following exception: {ex.Message.ToString()}");
+                    $"Your tournament could not be added with the following exception: {ex.Message}");
             }
         }
+    }
+    private static Embed TournamentCreationSuccess()
+    {
+        return new EmbedBuilder()
+        {
+            Title = "Your tournament was successfully added to the database.", 
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build();
+    }
+    private static Embed TournamentCreationWarning(IReadOnlyCollection<Tournament> tournaments, string abbreviation)
+    {
+        var embed = new EmbedBuilder()
+        {
+            Description = "Your tournament was added but others were found with this abbreviation.",
+            Color = Color.Gold
+        }.WithCurrentTimestamp();
+        
+        for (var i = 0; i < tournaments.Count; i++)
+        {
+            embed.AddField($"Tournaments found with abbreviation: {abbreviation}", $"**{(i+1).ToString()}:** {tournaments.ElementAt(i).Name}", true);
+            if (i != 0)
+            {
+                embed.Fields.ElementAt(0).Value = string.Concat(embed.Fields.ElementAt(0).Value, $"\n, **{(i + 1).ToString()}:** {tournaments.ElementAt(i).Name}");
+            }
+            if (embed.Fields.Count > 5 && embed.Fields.Count != tournaments.Count)
+            {
+                embed.AddField("Too many tournaments: ", $" {tournaments.Count - embed.Fields.Count} more tournaments were found...", true);
+            }
+        }
+        
+        return embed.Build();
+    }
+    private static Embed TournamentCreationFail(Exception ex)
+    {
+        return new EmbedBuilder()
+        {
+            Title = $"Your tournament could not be added with the following exception: {ex.Message}",
+            Color = Color.Red
+        }.WithCurrentTimestamp().Build();
     }
 }

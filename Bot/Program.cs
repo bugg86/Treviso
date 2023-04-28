@@ -55,6 +55,7 @@ public class Program
         services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddScoped<ITournamentRepository, TournamentRepository>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IMongoSettings, MongoSettings>();
 
         return services.BuildServiceProvider();
