@@ -17,6 +17,10 @@
 appsettings.json
 appsettings.Development.json
 bot_token
+guildid
+match-ping-channel-id
+ref-channel-id
+streamer-channel-id
 
 # Mono auto generated files
 mono_crash.*

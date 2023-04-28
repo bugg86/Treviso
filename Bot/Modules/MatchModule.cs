@@ -1,6 +1,7 @@
 ﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using oTSPA.Domain.Mongo.Models;
 using oTSPA.Domain.Mongo.Repositories.Interfaces;
 
@@ -20,7 +21,7 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
     }
 
     [SlashCommand("add", "command to add a match to database")]
-    public async Task AddMatch(string matchId, string abbreviation,
+    public async Task AddMatch(string matchId, string abbreviation, string round,
         string? date = null,
         string? time = null, 
         string? team1 = null, 
@@ -28,7 +29,9 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
         string? team2 = null, 
         string? captainDiscord2 = null, 
         string? referee = null, 
+        string? refereeDiscord = null,
         string? streamer = null, 
+        string? streamerDiscord = null,
         string? commentator1 = null, 
         string? commentator2 = null)
     {
@@ -36,6 +39,7 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
         {
             MatchId = matchId,
             Abbreviation = abbreviation,
+            Round = round,
             Date = date,
             Time = time,
             Team1 = team1,
@@ -43,7 +47,9 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             Team2 = team2,
             CaptainDiscord2 = captainDiscord2,
             Referee = referee,
+            RefereeDiscord = refereeDiscord,
             Streamer = streamer,
+            StreamerDiscord = streamerDiscord,
             Commentator1 = commentator1,
             Commentator2 = commentator2,
             User = Context.User.Id,
@@ -52,6 +58,14 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
 
         try
         {
+            List<Match> match = _matchRepository.FilterBy(x =>
+                x.MatchId.Equals(matchId) && x.Abbreviation.Equals(abbreviation)).ToList();
+            if (match.Count == 1)
+            {
+                await RespondAsync(embed: MatchCreationExists(matchId, abbreviation));
+
+                return;
+            }
             await _matchRepository.InsertOneAsync(newMatch);
             
             await RespondAsync(embed: MatchCreationSuccess());
@@ -86,12 +100,77 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
         }
     }
 
+    [SlashCommand("ping", "command to test match pings")]
+    public async Task PingMatch(string matchId, string abbreviation)
+    {
+        try
+        {
+            var matchPingChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../match-ping-channel-id")));
+            var refChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../ref-channel-id")));
+            var streamerChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../streamer-channel-id")));
+            
+            var match = await _matchRepository.FindOneAsync(x => x.MatchId.Equals(matchId) && x.Abbreviation.Equals(abbreviation));
+            
+            if (match.Referee is not null)
+            {
+                await refChannel.SendMessageAsync($"{match.RefereeDiscord}, please get ready for match id {match.MatchId} in about 15 minutes.");  
+            }
+            else
+            {
+                await refChannel.SendMessageAsync(
+                    $"@ Emergency Refs, there is no referee for match id: {match.MatchId}!");
+            }
+
+            if (match.Streamer is not null)
+            {
+                await streamerChannel.SendMessageAsync($"{match.StreamerDiscord}, " +
+                                                       $"{match.Commentator1 ?? string.Empty}, " +
+                                                       $"{match.Commentator2 ?? string.Empty} " +
+                                                       $"please get ready for match id {match.MatchId} in about 15 minutes. ");
+            }
+            
+            await matchPingChannel.SendMessageAsync($"{match.Round} match ``{match.MatchId}`` between ``{match.Team1}``" +
+                                                    $" and ``{match.Team2}`` will be starting in about 15 minutes!" +
+                                                    $" {match.CaptainDiscord1}, {match.CaptainDiscord2} please get online and prepare" +
+                                                    $" for an invite from ``{match.Referee}``!");
+
+            await RespondAsync("Ping messages sent!");
+        }
+        catch (Exception ex)
+        {
+            await RespondAsync(embed: MatchPingFail());
+        }
+    }
+    private static string CreateMatchPing(Match match)
+    {
+        return $"{match.Round} match ``{match.MatchId}`` between ``{match.Team1}``" +
+               $" and ``{match.Team2}`` will be starting in about 15 minutes!" +
+               $" {match.CaptainDiscord1}, {match.CaptainDiscord2} please get online and prepare" +
+               $" for an invite from ``{match.Referee}``!";
+    }
+    private static Embed MatchPingFail()
+    {
+        return new EmbedBuilder()
+        {
+            Title = "Could not create ping, match likely does not exist.",
+            Color = Color.Red
+        }.WithCurrentTimestamp().Build();
+    }
     private static Embed MatchCreationSuccess()
     {
         return new EmbedBuilder()
         {
             Title = "Your match was successfully added to the database.",
             Color = Color.Green
+        }.WithCurrentTimestamp().Build();
+    }
+
+    private static Embed MatchCreationExists(string matchId, string abbreviation)
+    {
+        return new EmbedBuilder()
+        {
+            Title = $"A match with id: {matchId} already exists for tournament: {abbreviation}.",
+            Color = Color.Gold
         }.WithCurrentTimestamp().Build();
     }
     private static Embed MatchCreationFail(Exception ex)
