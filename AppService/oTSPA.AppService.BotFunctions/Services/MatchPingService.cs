@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using Discord;
-using Discord.Rest;
-using Discord.Webhook;
+﻿using Discord.Webhook;
 using Microsoft.Extensions.Configuration;
 using oTSPA.AppService.BotFunctions.Services.Interfaces;
 using oTSPA.Domain.Mongo.Models;
@@ -23,11 +20,11 @@ public class MatchPingService : IMatchPingService
     public async Task SendPings(string abbreviation)
     {
         List<Match> matches = _matchRepository.FilterBy(x => x.Abbreviation.Equals(abbreviation)).ToList();
-
+        
         var matchPingsWebhook = new DiscordWebhookClient(_configuration.GetSection("MATCH_PINGS_WEBHOOK_URL").Value);
         var refWebhook = new DiscordWebhookClient(_configuration.GetSection("REF_WEBHOOK_URL").Value);
         var streamerWebhook = new DiscordWebhookClient(_configuration.GetSection("STREAMER_WEBHOOK_URL").Value);
-        
+
         DateTime currentTime = DateTime.Now.ToUniversalTime();
         
         foreach (var match in matches.Where(match => !match.MatchFinished || !match.PingSent))

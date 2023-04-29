@@ -1,3 +1,4 @@
+using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,15 +24,16 @@ public class Program
             })
             .ConfigureFunctionsWorkerDefaults()
             .Build();
-        
+
         host.Run();
     }
-
+    
     private static void AddAppServices(IServiceCollection services)
     {
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IMongoSettings, MongoSettings>();
         services.AddScoped<IMatchPingService, MatchPingService>();
+        services.AddSingleton<DiscordSocketClient>();
     }
     private static IConfigurationRoot LocalBuilder()
     {
