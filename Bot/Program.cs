@@ -1,4 +1,5 @@
-﻿using Bot.Handlers;
+﻿using System.Configuration;
+using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -17,20 +18,22 @@ public class Program
 {
     private DiscordSocketClient? _client;
     private InteractionService _commands = null!;
-    
+
     public static Task Main(string[] args) => new Program().MainAsync();
 
     private async Task MainAsync()
     {
-        var services = ConfigureServices();
+        IConfigurationRoot localConfig = LocalBuilder();
         
+        var services = ConfigureServices(localConfig);
+
         _client = services.GetRequiredService<DiscordSocketClient>();
         _commands = services.GetRequiredService<InteractionService>();
 
         _client.Log += Log;
         _commands.Log += Log;
         _client.Ready += ReadyAsync;
-        
+
 
         var token = await File.ReadAllTextAsync("../../../bot_token");
 
@@ -47,7 +50,7 @@ public class Program
         await _commands.RegisterCommandsGloballyAsync(true);
     }
 
-    private ServiceProvider ConfigureServices()
+    private ServiceProvider ConfigureServices(IConfigurationRoot localConfig)
     {
         var services = new ServiceCollection();
 
@@ -56,27 +59,30 @@ public class Program
         services.AddSingleton<CommandHandler>();
         services.AddScoped<ITournamentRepository, TournamentRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
-        services.AddScoped<IMongoSettings, MongoSettings>();
+        services.Configure<MongoSettings>(options =>
+        {
+            options.ConnectionString = localConfig.GetSection("CONNECTION_STRING").Value ?? string.Empty;
+            options.DatabaseName = localConfig.GetSection("DATABASE_NAME").Value ?? string.Empty;
+        });
+        services.AddSingleton<MongoSettings>();
 
         return services.BuildServiceProvider();
+    }
+    private static IConfigurationRoot LocalBuilder()
+    {
+        IConfigurationBuilder localConfigBuilder = new ConfigurationBuilder().AddEnvironmentVariables();
+        IConfigurationRoot localConfig = localConfigBuilder.AddJsonFile("local.settings.json", optional: true, reloadOnChange: true).Build();
+
+        // if (localConfig.GetConnectionString("APP_CONFIG") == null) { return localConfig; }
+
+        return new ConfigurationBuilder()
+            .AddConfiguration(localConfig)
+            .Build();
     }
 
     private Task Log(LogMessage msg)
     {
         Console.WriteLine(msg.ToString());
         return Task.CompletedTask;
-    }
-}
-public static class DbConnection
-{
-    private static IConfiguration _config = null!;
-    public static IConfiguration Configuration {
-        get {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-            _config = builder.Build();
-            return _config;
-        }
     }
 }

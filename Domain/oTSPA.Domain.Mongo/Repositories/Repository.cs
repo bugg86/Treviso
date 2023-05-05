@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using oTSPA.Domain.Mongo.Models;
@@ -11,9 +12,9 @@ public class Repository<TDocument> : IRepository<TDocument> where TDocument : ID
 {
     private readonly IMongoCollection<TDocument> _collection;
 
-    public Repository(IMongoSettings settings)
+    public Repository(IOptions<MongoSettings> settings)
     {
-        var database = new MongoClient(settings.ConnectionString).GetDatabase(settings.DatabaseName);
+        var database = new MongoClient(settings.Value.ConnectionString).GetDatabase(settings.Value.DatabaseName);
         _collection = database.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));
     }
 

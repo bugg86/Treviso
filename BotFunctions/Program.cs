@@ -19,7 +19,7 @@ public class Program
             .ConfigureAppConfiguration(config => config.AddConfiguration(localConfig))
             .ConfigureServices(services =>
             {
-                AddAppServices(services);
+                AddAppServices(services, localConfig);
                 services.AddLogging();
             })
             .ConfigureFunctionsWorkerDefaults()
@@ -28,10 +28,15 @@ public class Program
         host.Run();
     }
     
-    private static void AddAppServices(IServiceCollection services)
+    private static void AddAppServices(IServiceCollection services, IConfigurationRoot localConfig)
     {
         services.AddScoped<IMatchRepository, MatchRepository>();
-        services.AddScoped<IMongoSettings, MongoSettings>();
+        services.Configure<MongoSettings>(options =>
+        {
+            options.ConnectionString = localConfig.GetSection("CONNECTION_STRING").Value;
+            options.DatabaseName = localConfig.GetSection("DATABASE_NAME").Value;
+        });
+        services.AddSingleton<MongoSettings>();
         services.AddScoped<IMatchPingService, MatchPingService>();
         services.AddSingleton<DiscordSocketClient>();
     }

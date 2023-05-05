@@ -22,6 +22,7 @@ guildid
 match-ping-channel-id
 ref-channel-id
 streamer-channel-id
+analysislevel_7_default.editorconfig
 
 # Mono auto generated files
 mono_crash.*
