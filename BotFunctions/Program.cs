@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using oTSPA.AppService.BotFunctions.Services;
 using oTSPA.AppService.BotFunctions.Services.Interfaces;
 using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Models.Interfaces;
 using oTSPA.Domain.Mongo.Repositories;
 using oTSPA.Domain.Mongo.Repositories.Interfaces;
 
@@ -39,6 +38,9 @@ public class Program
         services.AddSingleton<MongoSettings>();
         services.AddScoped<IMatchPingService, MatchPingService>();
         services.AddSingleton<DiscordSocketClient>();
+
+        services.AddSingleton<GoogleSheetsService>();
+        services.AddScoped<IGoogleSheetsController, GoogleSheetsController>();
     }
     private static IConfigurationRoot LocalBuilder()
     {

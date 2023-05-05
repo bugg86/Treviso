@@ -17,6 +17,7 @@
 appsettings.json
 appsettings.Development.json
 local.settings.json
+client_secrets.json
 bot_token
 guildid
 match-ping-channel-id

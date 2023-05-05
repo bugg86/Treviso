@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using oTSPA.Domain.Mongo.Models;
 using oTSPA.Domain.Mongo.Models.Interfaces;
@@ -24,25 +25,32 @@ public class Program
     private async Task MainAsync()
     {
         IConfigurationRoot localConfig = LocalBuilder();
-        
-        var services = ConfigureServices(localConfig);
 
-        _client = services.GetRequiredService<DiscordSocketClient>();
-        _commands = services.GetRequiredService<InteractionService>();
+        async void ConfigureDelegate(IServiceCollection services)
+        {
+            ConfigureServices(services, localConfig);
 
-        _client.Log += Log;
-        _commands.Log += Log;
-        _client.Ready += ReadyAsync;
+            var serviceProvider = services.BuildServiceProvider();
+            _client = serviceProvider.GetRequiredService<DiscordSocketClient>();
+            _commands = serviceProvider.GetRequiredService<InteractionService>();
 
+            _client.Log += Log;
+            _commands.Log += Log;
+            _client.Ready += ReadyAsync;
 
-        var token = await File.ReadAllTextAsync("../../../bot_token");
+            var token = await File.ReadAllTextAsync("../../../bot_token");
 
-        await _client.LoginAsync(TokenType.Bot, token);
-        await _client.StartAsync();
+            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.StartAsync();
 
-        await services.GetRequiredService<CommandHandler>().InitializeAsync();
+            await serviceProvider.GetRequiredService<CommandHandler>().InitializeAsync();
+        }
 
-        await Task.Delay(-1);
+        var host = new HostBuilder()
+            .ConfigureAppConfiguration(config => config.AddConfiguration(localConfig))
+            .ConfigureServices(ConfigureDelegate);
+
+        await host.RunConsoleAsync();
     }
 
     private async Task ReadyAsync()
@@ -50,23 +58,22 @@ public class Program
         await _commands.RegisterCommandsGloballyAsync(true);
     }
 
-    private ServiceProvider ConfigureServices(IConfigurationRoot localConfig)
+    private void ConfigureServices(IServiceCollection services, IConfigurationRoot localConfig)
     {
-        var services = new ServiceCollection();
-
         services.AddSingleton<DiscordSocketClient>();
         services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
-        services.AddScoped<ITournamentRepository, TournamentRepository>();
-        services.AddScoped<IMatchRepository, MatchRepository>();
+        
         services.Configure<MongoSettings>(options =>
         {
-            options.ConnectionString = localConfig.GetSection("CONNECTION_STRING").Value ?? string.Empty;
-            options.DatabaseName = localConfig.GetSection("DATABASE_NAME").Value ?? string.Empty;
+            options.ConnectionString = localConfig.GetValue<string>("CONNECTION_STRING") ?? "mongodb://localhost:27017";
+            
+            options.DatabaseName = localConfig.GetValue<string>("DATABASE_NAME") ?? "staff-tool";
         });
         services.AddSingleton<MongoSettings>();
-
-        return services.BuildServiceProvider();
+        
+        services.AddScoped<ITournamentRepository, TournamentRepository>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
     }
     private static IConfigurationRoot LocalBuilder()
     {
