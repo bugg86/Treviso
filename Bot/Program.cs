@@ -37,12 +37,14 @@ public class Program
             _client.Log += Log;
             _commands.Log += Log;
             _client.Ready += ReadyAsync;
+            
 
             var token = await File.ReadAllTextAsync("../../../bot_token");
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
+            await serviceProvider.GetRequiredService<SelectionMenuHandler>().InitializeAsync();
             await serviceProvider.GetRequiredService<CommandHandler>().InitializeAsync();
         }
 
@@ -63,6 +65,7 @@ public class Program
         services.AddSingleton<DiscordSocketClient>();
         services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
+        services.AddSingleton<SelectionMenuHandler>();
         
         services.Configure<MongoSettings>(options =>
         {
@@ -74,6 +77,7 @@ public class Program
         
         services.AddScoped<ITournamentRepository, TournamentRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
+        services.AddScoped<ISheetRepository, SheetRepository>();
     }
     private static IConfigurationRoot LocalBuilder()
     {

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using MongoDB.Driver;
 using oTSPA.Domain.Mongo.Models;
 using oTSPA.Domain.Mongo.Models.Interfaces;
 
@@ -45,4 +46,5 @@ public interface IRepository<TDocument> where TDocument : IDocument
     void DeleteMany(Expression<Func<TDocument, bool>> filterExpression);
 
     Task DeleteManyAsync(Expression<Func<TDocument, bool>> filterExpression);
+    Task UpdateOneAsync(FilterDefinition<TDocument> filterExpression, UpdateDefinition<TDocument> document);
 }

@@ -131,6 +131,11 @@ public class Repository<TDocument> : IRepository<TDocument> where TDocument : ID
         });
     }
 
+    public async Task UpdateOneAsync(FilterDefinition<TDocument> filterExpression, UpdateDefinition<TDocument> document)
+    {
+        await _collection.UpdateOneAsync(filterExpression, document);
+    }
+
     public void DeleteMany(Expression<Func<TDocument, bool>> filterExpression)
     {
         _collection.DeleteMany(filterExpression);
