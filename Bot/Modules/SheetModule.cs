@@ -23,7 +23,7 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
     }
 
     [SlashCommand("add", "add sheets associated with a tournament")]
-    public async Task AddSheets(string mainSheet, string? adminSheet = null,  string? refSheet = null, string? poolSheet = null)
+    public async Task AddSheets(string mainSheet, string adminSheet,  string refSheet, string poolSheet)
     {
         Sheet newSheets = new Sheet
         {
@@ -52,7 +52,7 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
 
         foreach (Tournament tournament in tournaments)
         {
-            //Pass tournament object and sheet objects through the option custom id
+            //Pass tournament ObjectId and sheet ObjectId through the option custom id
             menuBuilder.AddOption(label: tournament.Abbreviation, tournament.Id.ToString() + ";" + newSheets.Id.ToString(), description: tournament.Name);
         }
         
@@ -60,4 +60,3 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
         await ReplyAsync("Pick the tournament to add sheets to:", components: builder.Build());
     }
 }
-

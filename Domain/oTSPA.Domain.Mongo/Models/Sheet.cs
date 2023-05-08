@@ -6,8 +6,8 @@ namespace oTSPA.Domain.Mongo.Models;
 public class Sheet : Document
 {
     public ObjectId? TournamentId { get; set; }
-    public string? Main { get; set; }
-    public string? Ref { get; set; }
-    public string? Pool { get; set; }
-    public string? Admin { get; set; }
+    public string Main { get; set; }
+    public string Ref { get; set; }
+    public string Pool { get; set; }
+    public string Admin { get; set; }
 }
