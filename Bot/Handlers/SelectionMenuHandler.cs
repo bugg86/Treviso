@@ -36,22 +36,31 @@ public class SelectionMenuHandler
         switch (arg.Data.CustomId)
         {
             case "tourney-sheet-selection":
-                await AddSheetSelectionMenuHandler(arg);
+                await SheetSelectionMenuHandler(arg);
                 break;
         }
     }
 
-    private async Task AddSheetSelectionMenuHandler(SocketMessageComponent arg)
+    private async Task SheetSelectionMenuHandler(SocketMessageComponent arg)
     {
         string selection = string.Join(", ", arg.Data.Values);
         string[] ids = selection.Split(';');
 
-        var filter = Builders<Sheet>.Filter.Eq(x => x.Id, new ObjectId(ids[1]));
+        var sheets = _sheetRepository.FilterBy(x => x.TournamentId.Equals(new ObjectId(ids[0]))).ToList();
 
+        if (sheets.Any())
+        {
+            foreach (Sheet sheet in sheets)
+            {
+                await _sheetRepository.DeleteByIdAsync(sheet.Id.ToString());
+            }
+        }
+        
+        var filter = Builders<Sheet>.Filter.Eq(x => x.Id, new ObjectId(ids[1]));
         var updateDefinition = Builders<Sheet>.Update.Set(x => x.TournamentId, new ObjectId(ids[0]));
-        
+
         await _sheetRepository.UpdateOneAsync(filter, updateDefinition);
-        
+
         await arg.RespondAsync("Sheets added to database.");
     }
 }

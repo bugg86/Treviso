@@ -22,7 +22,7 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
         _tournamentRepository = tournamentRepository;
     }
 
-    [SlashCommand("add", "add sheets associated with a tournament")]
+    [SlashCommand("addReplace", "add or replace sheets associated with a tournament")]
     public async Task AddSheets(string mainSheet, string adminSheet,  string refSheet, string poolSheet)
     {
         Sheet newSheets = new Sheet
