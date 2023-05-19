@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Models.Interfaces;
-using Treviso.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Models.Interfaces;
+using Treviso.Domain.Sql.Repositories.Interfaces;
 
-namespace Treviso.Domain.Mongo.Repositories;
+namespace Treviso.Domain.Sql.Repositories;
 
 public class Repository<TDocument> : IRepository<TDocument> where TDocument : IDocument
 {

@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{4F0A5B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3A7B7747-F9C7-462E-930B-6C106F1AF13B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.Domain.Mongo", "Domain\Treviso.Domain.Mongo\Treviso.Domain.Mongo.csproj", "{936EC25D-FB66-4493-A9AE-6AC96CB564A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.Domain.Sql", "Domain\Treviso.Domain.Sql\Treviso.Domain.Sql.csproj", "{936EC25D-FB66-4493-A9AE-6AC96CB564A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.Domain.Tests.Mongo", "Domain\Tests\Treviso.Domain.Tests.Mongo\Treviso.Domain.Tests.Mongo.csproj", "{7D99C049-AEE0-46D9-8734-8AD2B951A83B}"
 EndProject

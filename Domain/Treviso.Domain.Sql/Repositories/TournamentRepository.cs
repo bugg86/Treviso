@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using Treviso.Domain.Mongo.Models.Interfaces;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Repositories.Interfaces;
 
-namespace Treviso.Domain.Mongo.Repositories;
+namespace Treviso.Domain.Sql.Repositories;
 
 public class TournamentRepository : Repository<Tournament>, ITournamentRepository
 {

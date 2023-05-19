@@ -1,17 +1,13 @@
-﻿using System.Configuration;
-using Bot.Handlers;
+﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Models.Interfaces;
-using Treviso.Domain.Mongo.Repositories;
-using Treviso.Domain.Mongo.Repositories.Interfaces;
-using ConfigurationSection = Microsoft.Extensions.Configuration.ConfigurationSection;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Repositories;
+using Treviso.Domain.Sql.Repositories.Interfaces;
 
 namespace Bot;
 

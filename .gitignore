@@ -13,6 +13,8 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+analysislevel_7_default.editorconfig
+
 # Local Settings
 appsettings.json
 appsettings.Development.json

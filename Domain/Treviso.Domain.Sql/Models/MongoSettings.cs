@@ -1,4 +1,4 @@
-﻿namespace Treviso.Domain.Mongo.Models;
+﻿namespace Treviso.Domain.Sql.Models;
 
 public class MongoSettings
 {

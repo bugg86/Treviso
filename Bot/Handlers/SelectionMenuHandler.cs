@@ -2,8 +2,9 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Repositories.Interfaces;
 
 namespace Bot.Handlers;
 

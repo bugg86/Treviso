@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
 using MongoDB.Driver;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Models.Interfaces;
+using Treviso.Domain.Sql.Models.Interfaces;
 
-namespace Treviso.Domain.Mongo.Repositories.Interfaces;
+namespace Treviso.Domain.Sql.Repositories.Interfaces;
 
 public interface IRepository<TDocument> where TDocument : IDocument
 {

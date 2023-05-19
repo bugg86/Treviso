@@ -28,6 +28,6 @@
     <ItemGroup>
       <ProjectReference Include="..\AppService\Treviso.AppService.BotFunctions\Treviso.AppService.BotFunctions.csproj" />
       <ProjectReference Include="..\Domain\Treviso.Domain.Data\Treviso.Domain.Data.csproj" />
-      <ProjectReference Include="..\Domain\Treviso.Domain.Mongo\Treviso.Domain.Mongo.csproj" />
+      <ProjectReference Include="..\Domain\Treviso.Domain.Sql\Treviso.Domain.Sql.csproj" />
     </ItemGroup>
 </Project>

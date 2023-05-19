@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
-using Treviso.Domain.Mongo.Models.Interfaces;
+using Treviso.Domain.Sql.Models.Interfaces;
 
-namespace Treviso.Domain.Mongo.Models;
+namespace Treviso.Domain.Sql.Models;
 
 public abstract class Document : IDocument
 {

@@ -1,4 +1,4 @@
-﻿namespace Treviso.Domain.Mongo.Models;
+﻿namespace Treviso.Domain.Sql.Models;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class BsonCollectionAttribute : Attribute

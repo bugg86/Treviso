@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using Treviso.AppService.BotFunctions.Services.Interfaces;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Repositories.Interfaces;
 
 namespace Treviso.AppService.BotFunctions.Services;
 

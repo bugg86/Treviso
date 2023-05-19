@@ -1,6 +1,6 @@
 using MongoDB.Bson;
 
-namespace Treviso.Domain.Mongo.Models;
+namespace Treviso.Domain.Sql.Models;
 
 [BsonCollection("sheets")]
 public class Sheet : Document

@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Domain\Treviso.Domain.Mongo\Treviso.Domain.Mongo.csproj" />
+      <ProjectReference Include="..\..\Domain\Treviso.Domain.Sql\Treviso.Domain.Sql.csproj" />
     </ItemGroup>
 
     <ItemGroup>

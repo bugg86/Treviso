@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Treviso.Domain.Mongo.Models.Interfaces;
+namespace Treviso.Domain.Sql.Models.Interfaces;
 
 public interface IDocument
 {

@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Treviso.AppService.BotFunctions.Services;
 using Treviso.AppService.BotFunctions.Services.Interfaces;
-using Treviso.Domain.Mongo.Models;
-using Treviso.Domain.Mongo.Repositories;
-using Treviso.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Repositories;
+using Treviso.Domain.Sql.Repositories.Interfaces;
 
 namespace BotFunctions;
 
