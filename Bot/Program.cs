@@ -7,10 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Models.Interfaces;
-using oTSPA.Domain.Mongo.Repositories;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Mongo.Models;
+using Treviso.Domain.Mongo.Models.Interfaces;
+using Treviso.Domain.Mongo.Repositories;
+using Treviso.Domain.Mongo.Repositories.Interfaces;
 using ConfigurationSection = Microsoft.Extensions.Configuration.ConfigurationSection;
 
 namespace Bot;

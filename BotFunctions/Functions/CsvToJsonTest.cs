@@ -2,9 +2,7 @@ using System.Net;
 using System.Text;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
-using oTSPA.AppService.BotFunctions.Services;
-using oTSPA.AppService.BotFunctions.Services.Interfaces;
+using Treviso.AppService.BotFunctions.Services.Interfaces;
 
 namespace BotFunctions.Functions;
 

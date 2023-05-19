@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Domain\oTSPA.Domain.Mongo\oTSPA.Domain.Mongo.csproj" />
+      <ProjectReference Include="..\BotFunctions\BotFunctions.csproj" />
     </ItemGroup>
 
 </Project>

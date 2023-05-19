@@ -2,11 +2,13 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using oTSPA.AppService.BotFunctions.Services;
-using oTSPA.AppService.BotFunctions.Services.Interfaces;
-using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Repositories;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using Treviso.AppService.BotFunctions.Services;
+using Treviso.AppService.BotFunctions.Services.Interfaces;
+using Treviso.Domain.Mongo.Models;
+using Treviso.Domain.Mongo.Repositories;
+using Treviso.Domain.Mongo.Repositories.Interfaces;
+
+namespace BotFunctions;
 
 public class Program
 {

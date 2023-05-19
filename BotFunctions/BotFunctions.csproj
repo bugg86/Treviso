@@ -26,8 +26,8 @@
         <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\AppService\oTSPA.AppService.BotFunctions\oTSPA.AppService.BotFunctions.csproj" />
-      <ProjectReference Include="..\Domain\oTSPA.Domain.Data\oTSPA.Domain.Data.csproj" />
-      <ProjectReference Include="..\Domain\oTSPA.Domain.Mongo\oTSPA.Domain.Mongo.csproj" />
+      <ProjectReference Include="..\AppService\Treviso.AppService.BotFunctions\Treviso.AppService.BotFunctions.csproj" />
+      <ProjectReference Include="..\Domain\Treviso.Domain.Data\Treviso.Domain.Data.csproj" />
+      <ProjectReference Include="..\Domain\Treviso.Domain.Mongo\Treviso.Domain.Mongo.csproj" />
     </ItemGroup>
 </Project>

@@ -1,9 +1,8 @@
 using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
-using MongoDB.Bson;
-using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Mongo.Models;
+using Treviso.Domain.Mongo.Repositories.Interfaces;
 
 namespace Bot.Modules;
 
@@ -23,14 +22,25 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
     }
 
     [SlashCommand("addReplace", "add or replace sheets associated with a tournament")]
-    public async Task AddSheets(string mainSheet, string adminSheet,  string refSheet, string poolSheet)
+    public async Task AddSheets(string mainSheet, string adminSheet,  string refSheet, string refType, string poolSheet)
     {
+        if (!refType.Equals("hitomiv4") || 
+            !refType.Equals("hitomiv5") || 
+            !refType.Equals("dioandleo") ||
+            !refType.Equals("icedynamix"))
+        {
+            await RespondAsync("You did not enter a valid ref sheet type. The valid types are: hitomiv4, hitomiv5, dioandleo, and icedynamix. Please enter one of these and try again.");
+            return;
+        }
         Sheet newSheets = new Sheet
         {
             Main = mainSheet,
             Admin = adminSheet,
             Pool = poolSheet,
-            Ref = refSheet
+            Ref = refSheet,
+            RefType = refType,
+            User = Context.User.Id,
+            Version = 2
         };
 
         await _sheetRepository.InsertOneAsync(newSheets);

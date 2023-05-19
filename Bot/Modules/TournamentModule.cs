@@ -1,8 +1,8 @@
 ﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
-using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Mongo.Models;
+using Treviso.Domain.Mongo.Repositories.Interfaces;
 
 namespace Bot.Modules;
 

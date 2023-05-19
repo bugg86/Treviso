@@ -1,12 +1,9 @@
-using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Newtonsoft.Json;
-using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Mongo.Models;
+using Treviso.Domain.Mongo.Repositories.Interfaces;
 
 namespace Bot.Handlers;
 

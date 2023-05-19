@@ -1,8 +1,8 @@
 ﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
-using oTSPA.Domain.Mongo.Models;
-using oTSPA.Domain.Mongo.Repositories.Interfaces;
+using Treviso.Domain.Mongo.Models;
+using Treviso.Domain.Mongo.Repositories.Interfaces;
 
 namespace Bot.Modules;
 
@@ -60,7 +60,7 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
         try
         {
             List<Match> match = _matchRepository.FilterBy(x =>
-                x.MatchId.Equals(matchId) && x.Abbreviation.Equals(abbreviation)).ToList();
+                x.MatchId.Equals(matchId) && x.Abbreviation!.Equals(abbreviation)).ToList();
             if (match.Count == 1)
             {
                 await RespondAsync(embed: MatchCreationExists(matchId, abbreviation));
@@ -82,7 +82,7 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
     {
         try
         {
-            List<Match> match = _matchRepository.FilterBy(x => x.MatchId.Equals(matchId) && x.Abbreviation.Equals(abbreviation)).ToList();
+            List<Match> match = _matchRepository.FilterBy(x => x.MatchId.Equals(matchId) && x.Abbreviation!.Equals(abbreviation)).ToList();
 
             if (match.Count == 0)
             {
@@ -110,7 +110,7 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             var refChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../ref-channel-id")));
             var streamerChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../streamer-channel-id")));
             
-            var match = await _matchRepository.FindOneAsync(x => x.MatchId.Equals(matchId) && x.Abbreviation.Equals(abbreviation));
+            var match = await _matchRepository.FindOneAsync(x => x.MatchId.Equals(matchId) && x.Abbreviation!.Equals(abbreviation));
             
             if (match.Referee is not null)
             {

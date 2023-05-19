@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
-using oTSPA.AppService.BotFunctions.Services.Interfaces;
-using TimerInfo = oTSPA.Domain.Data.Models.TimerInfo;
+using Treviso.AppService.BotFunctions.Services.Interfaces;
+using TimerInfo = Treviso.Domain.Data.Models.TimerInfo;
 
 namespace BotFunctions.Functions;
 

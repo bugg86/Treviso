@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{4F0A5B4C-953F-43C3-BF9C-02EBE8FD56D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3A7B7747-F9C7-462E-930B-6C106F1AF13B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.Domain.Mongo", "Domain\Treviso.Domain.Mongo\Treviso.Domain.Mongo.csproj", "{936EC25D-FB66-4493-A9AE-6AC96CB564A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.Domain.Tests.Mongo", "Domain\Tests\Treviso.Domain.Tests.Mongo\Treviso.Domain.Tests.Mongo.csproj", "{7D99C049-AEE0-46D9-8734-8AD2B951A83B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "Bot\Bot.csproj", "{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotFunctions", "BotFunctions\BotFunctions.csproj", "{1BA834F5-093E-44E0-8DAC-7ADA92C5B4FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.Domain.Data", "Domain\Treviso.Domain.Data\Treviso.Domain.Data.csproj", "{D349BBE6-5362-4E61-B8D2-55F46A14E965}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppService", "AppService", "{138CA1AF-643C-4694-9EFB-1654E0DD5C72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Treviso.AppService.BotFunctions", "AppService\Treviso.AppService.BotFunctions\Treviso.AppService.BotFunctions.csproj", "{91D5C526-3481-4681-B39C-6DBFC2A7190E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{373F2390-5E39-4C63-9E97-D66F7F01B79F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{936EC25D-FB66-4493-A9AE-6AC96CB564A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{936EC25D-FB66-4493-A9AE-6AC96CB564A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{936EC25D-FB66-4493-A9AE-6AC96CB564A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{936EC25D-FB66-4493-A9AE-6AC96CB564A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D99C049-AEE0-46D9-8734-8AD2B951A83B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D99C049-AEE0-46D9-8734-8AD2B951A83B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D99C049-AEE0-46D9-8734-8AD2B951A83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D99C049-AEE0-46D9-8734-8AD2B951A83B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74C9808A-D8A5-42BE-B8B6-29040EAEF9FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BA834F5-093E-44E0-8DAC-7ADA92C5B4FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BA834F5-093E-44E0-8DAC-7ADA92C5B4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BA834F5-093E-44E0-8DAC-7ADA92C5B4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BA834F5-093E-44E0-8DAC-7ADA92C5B4FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D349BBE6-5362-4E61-B8D2-55F46A14E965}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D349BBE6-5362-4E61-B8D2-55F46A14E965}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D349BBE6-5362-4E61-B8D2-55F46A14E965}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D349BBE6-5362-4E61-B8D2-55F46A14E965}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91D5C526-3481-4681-B39C-6DBFC2A7190E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91D5C526-3481-4681-B39C-6DBFC2A7190E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91D5C526-3481-4681-B39C-6DBFC2A7190E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91D5C526-3481-4681-B39C-6DBFC2A7190E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3A7B7747-F9C7-462E-930B-6C106F1AF13B} = {4F0A5B4C-953F-43C3-BF9C-02EBE8FD56D3}
+		{936EC25D-FB66-4493-A9AE-6AC96CB564A5} = {4F0A5B4C-953F-43C3-BF9C-02EBE8FD56D3}
+		{7D99C049-AEE0-46D9-8734-8AD2B951A83B} = {3A7B7747-F9C7-462E-930B-6C106F1AF13B}
+		{D349BBE6-5362-4E61-B8D2-55F46A14E965} = {4F0A5B4C-953F-43C3-BF9C-02EBE8FD56D3}
+		{91D5C526-3481-4681-B39C-6DBFC2A7190E} = {138CA1AF-643C-4694-9EFB-1654E0DD5C72}
+		{373F2390-5E39-4C63-9E97-D66F7F01B79F} = {138CA1AF-643C-4694-9EFB-1654E0DD5C72}
+	EndGlobalSection
+EndGlobal
