@@ -1,148 +1,66 @@
 ﻿using System.Linq.Expressions;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Treviso.Domain.Sql.Models;
-using Treviso.Domain.Sql.Models.Interfaces;
+using Treviso.Domain.Sql.Contexts.Interfaces;
 using Treviso.Domain.Sql.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Treviso.Domain.Sql.Repositories;
 
-public class Repository<TDocument> : IRepository<TDocument> where TDocument : IDocument
+public abstract class Repository<T> : IRepository<T> where T : class
 {
-    private readonly IMongoCollection<TDocument> _collection;
+    private readonly ITrevisoContext _trevisoContext;
 
-    public Repository(IOptions<MongoSettings> settings)
+    public Repository(ITrevisoContext trevisoContext)
     {
-        var database = new MongoClient(settings.Value.ConnectionString).GetDatabase(settings.Value.DatabaseName);
-        _collection = database.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));
+        _trevisoContext = trevisoContext;
+    }
+    public IQueryable<T> GetAll()
+    {
+        return _trevisoContext.Set<T>();
+    }
+    public IQueryable<T> GetAllNoTracking()
+    {
+        return _trevisoContext.Set<T>().AsNoTracking();
+    }
+    public T? GetSingle(params object?[]? keyValues)
+    {
+        return _trevisoContext.Set<T>().Find(keyValues);
+    }
+    public T? GetSingle(Expression<Func<T, bool>> predicate)
+    {
+        return _trevisoContext.Set<T>().FirstOrDefault(predicate);
     }
 
-    private string? GetCollectionName(Type documentType)
+    public IQueryable<T> GetMany(Expression<Func<T, bool>> predicate)
     {
-        return ((BsonCollectionAttribute) documentType.GetCustomAttributes(
-                typeof(BsonCollectionAttribute),
-                true)
-            .FirstOrDefault()!)?.CollectionName;
+        return _trevisoContext.Set<T>().Where(predicate);
     }
-    public virtual IQueryable<TDocument> AsQueryable()
+    public T? GetSingleNoTracking(Expression<Func<T, bool>> predicate)
     {
-        return _collection.AsQueryable();
+        return _trevisoContext.Set<T>().AsNoTracking().FirstOrDefault(predicate);
     }
-
-    public virtual IEnumerable<TDocument> FilterBy(
-        Expression<Func<TDocument, bool>> filterExpression)
+    public T Add(T entity)
     {
-        return _collection.Find(filterExpression).ToEnumerable();
+        _trevisoContext.Add(entity);
+        return entity;
     }
-
-    public virtual IEnumerable<TProjected> FilterBy<TProjected>(
-        Expression<Func<TDocument, bool>> filterExpression,
-        Expression<Func<TDocument, TProjected>> projectionExpression)
+    public List<T> AddRange(List<T> entities)
     {
-        return _collection.Find(filterExpression).Project(projectionExpression).ToEnumerable();
+        _trevisoContext.AddRange(entities);
+        return entities;
     }
-
-    public virtual TDocument FindOne(Expression<Func<TDocument, bool>> filterExpression)
+    public T Update(T entity, T oldEntity)
     {
-        return _collection.Find(filterExpression).FirstOrDefault();
+        oldEntity = entity;
+        _trevisoContext.Update(oldEntity);
+        return oldEntity;
     }
-
-    public virtual Task<TDocument> FindOneAsync(Expression<Func<TDocument, bool>> filterExpression)
+    public T Remove(T entity)
     {
-        return Task.Run(() => _collection.Find(filterExpression).FirstOrDefaultAsync());
+        _trevisoContext.Remove(entity);
+        return entity;
     }
-
-    public virtual TDocument FindById(string id)
+    public int SaveChanges()
     {
-        var objectId = new ObjectId(id);
-        var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
-        return _collection.Find(filter).SingleOrDefault();
-    }
-
-    public virtual Task<TDocument> FindByIdAsync(string id)
-    {
-        return Task.Run(() =>
-        {
-            var objectId = new ObjectId(id);
-            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
-            return _collection.Find(filter).SingleOrDefaultAsync();
-        });
-    }
-
-
-    public virtual void InsertOne(TDocument document)
-    {
-        _collection.InsertOne(document);
-    }
-
-    public virtual Task InsertOneAsync(TDocument document)
-    {
-        return Task.Run(() => _collection.InsertOneAsync(document));
-    }
-
-    public void InsertMany(ICollection<TDocument> documents)
-    {
-        _collection.InsertMany(documents);
-    }
-
-
-    public virtual async Task InsertManyAsync(ICollection<TDocument> documents)
-    {
-        await _collection.InsertManyAsync(documents);
-    }
-
-    public void ReplaceOne(TDocument document)
-    {
-        var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, document.Id);
-        _collection.FindOneAndReplace(filter, document);
-    }
-
-    public virtual async Task ReplaceOneAsync(TDocument document)
-    {
-        var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, document.Id);
-        await _collection.FindOneAndReplaceAsync(filter, document);
-    }
-
-    public void DeleteOne(Expression<Func<TDocument, bool>> filterExpression)
-    {
-        _collection.FindOneAndDelete(filterExpression);
-    }
-
-    public Task DeleteOneAsync(Expression<Func<TDocument, bool>> filterExpression)
-    {
-        return Task.Run(() => _collection.FindOneAndDeleteAsync(filterExpression));
-    }
-
-    public void DeleteById(string id)
-    {
-        var objectId = new ObjectId(id);
-        var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
-        _collection.FindOneAndDelete(filter);
-    }
-
-    public Task DeleteByIdAsync(string id)
-    {
-        return Task.Run(() =>
-        {
-            var objectId = new ObjectId(id);
-            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
-            _collection.FindOneAndDeleteAsync(filter);
-        });
-    }
-
-    public async Task UpdateOneAsync(FilterDefinition<TDocument> filterExpression, UpdateDefinition<TDocument> document)
-    {
-        await _collection.UpdateOneAsync(filterExpression, document);
-    }
-
-    public void DeleteMany(Expression<Func<TDocument, bool>> filterExpression)
-    {
-        _collection.DeleteMany(filterExpression);
-    }
-
-    public Task DeleteManyAsync(Expression<Func<TDocument, bool>> filterExpression)
-    {
-        return Task.Run(() => _collection.DeleteManyAsync(filterExpression));
+        return _trevisoContext.SaveChanges();
     }
 }

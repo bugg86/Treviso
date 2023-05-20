@@ -1,11 +1,9 @@
-using MongoDB.Bson;
-
 namespace Treviso.Domain.Sql.Models;
 
-[BsonCollection("sheets")]
-public class Sheet : Document
+public class Sheet
 {
-    public ObjectId? TournamentId { get; set; }
+    public Guid Id { get; set; }
+    public Guid? TournamentId { get; set; }
     public string Main { get; set; }
     public string Ref { get; set; }
     public string RefType { get; set; }
@@ -13,4 +11,6 @@ public class Sheet : Document
     public string Admin { get; set; }
     public ulong User { get; set; }
     public int Version { get; set; }
+    
+    public virtual Tournament Tournament { get; set; }
 }

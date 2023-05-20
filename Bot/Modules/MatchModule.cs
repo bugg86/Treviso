@@ -29,15 +29,13 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
         string? captainDiscord2 = null, 
         string? referee = null, 
         string? refereeDiscord = null,
-        string? streamer = null, 
-        string? streamerDiscord = null,
+        string? streamer = null,
         string? commentator1 = null, 
         string? commentator2 = null)
     {
         var newMatch = new Match
         {
             MatchId = matchId,
-            Abbreviation = abbreviation,
             Round = round,
             Date = date,
             Time = time,
@@ -48,7 +46,6 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             Referee = referee,
             RefereeDiscord = refereeDiscord,
             Streamer = streamer,
-            StreamerDiscord = streamerDiscord,
             Commentator1 = commentator1,
             Commentator2 = commentator2,
             PingSent = false,
@@ -59,15 +56,15 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
 
         try
         {
-            List<Match> match = _matchRepository.FilterBy(x =>
-                x.MatchId.Equals(matchId) && x.Abbreviation!.Equals(abbreviation)).ToList();
+            List<Match> match = _matchRepository.GetMany(x =>
+                x.MatchId.Equals(matchId)).ToList();
             if (match.Count == 1)
             {
                 await RespondAsync(embed: MatchCreationExists(matchId, abbreviation));
 
                 return;
             }
-            await _matchRepository.InsertOneAsync(newMatch);
+            _matchRepository.Add(newMatch);
             
             await RespondAsync(embed: MatchCreationSuccess());
         }
@@ -82,18 +79,18 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
     {
         try
         {
-            List<Match> match = _matchRepository.FilterBy(x => x.MatchId.Equals(matchId) && x.Abbreviation!.Equals(abbreviation)).ToList();
+            List<Match> match = _matchRepository.GetMany(x => x.MatchId.Equals(matchId)).ToList();
 
             if (match.Count == 0)
             {
                 await RespondAsync(embed: MatchRemovalNone());
             }
-            else
-            {
-                await _matchRepository.DeleteOneAsync(x => x.MatchId == matchId && x.Abbreviation == abbreviation);
-                
-                await RespondAsync(embed: MatchRemovalSuccess(matchId, abbreviation));
-            }
+            // else
+            // {
+            //     _matchRepository.Remove(x => x.MatchId == matchId && x.Abbreviation == abbreviation);
+            //     
+            //     await RespondAsync(embed: MatchRemovalSuccess(matchId, abbreviation));
+            // }
         }
         catch (Exception ex)
         {
@@ -110,7 +107,14 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             var refChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../ref-channel-id")));
             var streamerChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../streamer-channel-id")));
             
-            var match = await _matchRepository.FindOneAsync(x => x.MatchId.Equals(matchId) && x.Abbreviation!.Equals(abbreviation));
+            var match = _matchRepository.GetSingle(x => x.MatchId.Equals(matchId));
+
+            if (match is null)
+            {
+                await RespondAsync("No match found");
+
+                return;
+            }
             
             if (match.Referee is not null)
             {
@@ -124,7 +128,7 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
 
             if (match.Streamer is not null)
             {
-                await streamerChannel.SendMessageAsync($"{match.StreamerDiscord}, " +
+                await streamerChannel.SendMessageAsync($"{match.Streamer}, " +
                                                        $"{match.Commentator1 ?? string.Empty}, " +
                                                        $"{match.Commentator2 ?? string.Empty} " +
                                                        $"please get ready for match id {match.MatchId} in about 15 minutes. ");

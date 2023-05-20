@@ -20,13 +20,12 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
     }
 
     [SlashCommand("add", "command to add tournament to database")]
-    public async Task AddTournament(string abbreviation, string name, bool bws, decimal iteration, int teamSize, string vs, bool badged, string rangeLower, string rangeUpper)
+    public async Task AddTournament(string abbreviation, string name, bool bws, int teamSize, string vs, bool badged, string rangeLower, string rangeUpper)
     {
         var newTournament = new Tournament
         {
             Abbreviation = abbreviation,
             Name = name,
-            Iteration = iteration,
             Bws = bws,
             Badged = badged,
             TeamSize = teamSize,
@@ -40,17 +39,17 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
         try
         {
             List<Tournament> tournaments =
-                _tournamentRepository.FilterBy(x => x.Abbreviation.Equals(abbreviation)).ToList();
-
+                _tournamentRepository.GetMany(x => x.Abbreviation.Equals(abbreviation)).ToList();
+            
             if (tournaments.Count != 0)
             {
                 await RespondAsync(embed: TournamentCreationWarning(tournaments, abbreviation));
                 
-                await _tournamentRepository.InsertOneAsync(newTournament);
+                _tournamentRepository.Add(newTournament);
             }
             else
             {
-                await _tournamentRepository.InsertOneAsync(newTournament);
+                _tournamentRepository.Add(newTournament);
 
                 await RespondAsync(embed: TournamentCreationSuccess());
             }
@@ -64,9 +63,9 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
     [SlashCommand("remove", "removes a tournament from the database")]
     public async Task RemoveTournament(string abbreviation, string name)
     {
-        List<Tournament> tournaments = _tournamentRepository.FilterBy(x => x.Name.Equals(name) && x.Abbreviation.Equals(abbreviation)).ToList();
+        var tournament = _tournamentRepository.GetSingle(x => x.Name.Equals(name) && x.Abbreviation.Equals(abbreviation));
 
-        if (tournaments.Count == 0)
+        if (tournament is null)
         {
             await RespondAsync("There were no tournaments found with that abbreviation and name. Check your parameters and try again.");
         }
@@ -74,7 +73,7 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
         {
             try
             {
-                await _tournamentRepository.DeleteOneAsync(x => x.Id == tournaments.ElementAt(0).Id);
+                _tournamentRepository.Remove(tournament);
 
                 await RespondAsync($"Tournament {abbreviation} | {name} was successfully removed.");
             }

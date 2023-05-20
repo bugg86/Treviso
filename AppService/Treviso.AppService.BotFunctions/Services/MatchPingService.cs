@@ -20,7 +20,7 @@ public class MatchPingService : IMatchPingService
     
     public async Task SendPings(string tournamentId)
     {
-        List<Match> matches = _matchRepository.FilterBy(x => x.TournamentId.Equals(new ObjectId(tournamentId))).ToList();
+        List<Match> matches = _matchRepository.GetMany(x => x.TournamentId.Equals(new ObjectId(tournamentId))).ToList();
         
         var matchPingsWebhook = new DiscordWebhookClient(_configuration.GetSection("MATCH_PINGS_WEBHOOK_URL").Value);
         var refWebhook = new DiscordWebhookClient(_configuration.GetSection("REF_WEBHOOK_URL").Value);
@@ -48,7 +48,7 @@ public class MatchPingService : IMatchPingService
 
             if (match.Streamer is not null)
             {
-                await streamerWebhook.SendMessageAsync($"{match.StreamerDiscord}, " +
+                await streamerWebhook.SendMessageAsync($"{match.Streamer}, " +
                                                        $"{match.Commentator1 ?? string.Empty}, " +
                                                        $"{match.Commentator2 ?? string.Empty} " +
                                                        $"please get ready for match id {match.MatchId} in about 15 minutes. ");

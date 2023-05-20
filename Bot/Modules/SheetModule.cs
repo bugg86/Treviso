@@ -43,7 +43,7 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
             Version = 2
         };
 
-        await _sheetRepository.InsertOneAsync(newSheets);
+        _sheetRepository.Add(newSheets);
 
         var menuBuilder = new SelectMenuBuilder()
             .WithPlaceholder("Select a tourney")
@@ -51,7 +51,7 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
             .WithMinValues(1)
             .WithMaxValues(1);
 
-        IList<Tournament> tournaments = _tournamentRepository.FilterBy(x => !string.IsNullOrEmpty(x.Abbreviation)).ToList();
+        IList<Tournament> tournaments = _tournamentRepository.GetMany(x => !string.IsNullOrEmpty(x.Abbreviation)).ToList();
 
         if (!tournaments.Any())
         {

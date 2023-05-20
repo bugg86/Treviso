@@ -44,20 +44,17 @@ public class SelectionMenuHandler
         string selection = string.Join(", ", arg.Data.Values);
         string[] ids = selection.Split(';');
 
-        var sheets = _sheetRepository.FilterBy(x => x.TournamentId.Equals(new ObjectId(ids[0]))).ToList();
+        var sheets = _sheetRepository.GetMany(x => x.TournamentId.Equals(new ObjectId(ids[0]))).ToList();
 
         if (sheets.Any())
         {
             foreach (Sheet sheet in sheets)
             {
-                await _sheetRepository.DeleteByIdAsync(sheet.Id.ToString());
+                _sheetRepository.Remove(sheet);
             }
         }
-        
-        var filter = Builders<Sheet>.Filter.Eq(x => x.Id, new ObjectId(ids[1]));
-        var updateDefinition = Builders<Sheet>.Update.Set(x => x.TournamentId, new ObjectId(ids[0]));
 
-        await _sheetRepository.UpdateOneAsync(filter, updateDefinition);
+        // _sheetRepository.Update(filter, updateDefinition);
 
         await arg.RespondAsync("Sheets added to database.");
     }
