@@ -37,86 +37,49 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
             User = Context.User.Id,
             Version = 1
         };
-        
-            List<Tournament> tournaments =
-                _tournamentRepository.GetMany(x => x.Abbreviation.Equals(abbreviation)).ToList();
-            
-            if (tournaments.Count != 0)
-            {
-                await RespondAsync(embed: TournamentCreationWarning(tournaments, abbreviation));
-                
-                _tournamentRepository.Add(newTournament);
-            }
-            else
-            {
-                _tournamentRepository.Add(newTournament);
 
-                await RespondAsync(embed: TournamentCreationSuccess());
-            }
-            // await RespondAsync(embed: TournamentCreationFail(ex));
+        Tournament? tourney = _tournamentRepository.GetSingle(x => x.GuildId.Equals(Context.Guild.Id));
+
+        if (tourney is null)
+        {
+            _tournamentRepository.Add(newTournament);
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = "Your tournament was successfully added to the database.", 
+                Color = Color.Green
+            }.WithCurrentTimestamp().Build());
+            
+            return;
         }
+
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "Your tournament could not be added because there is already one associated with the discord.",
+            Color = Color.Red
+        }.WithCurrentTimestamp().Build());
+    }
 
     [SlashCommand("remove", "removes a tournament from the database")]
     public async Task RemoveTournament(string abbreviation, string name)
     {
-        var tournament = _tournamentRepository.GetSingle(x => x.Name.Equals(name) && x.Abbreviation.Equals(abbreviation));
+        Tournament? tournament = _tournamentRepository.GetSingle(x => x.GuildId.Equals(Context.Guild.Id));
 
         if (tournament is null)
         {
-            await RespondAsync("There were no tournaments found with that abbreviation and name. Check your parameters and try again.");
+            await RespondAsync("There were no tournaments found associated with this server.");
+            
+            return;
         }
-        else
+        try
         {
-            try
-            {
-                _tournamentRepository.Remove(tournament);
+            _tournamentRepository.Remove(tournament);
 
-                await RespondAsync($"Tournament {abbreviation} | {name} was successfully removed.");
-            }
-            catch (Exception ex)
-            {
-                await RespondAsync(
-                    $"Your tournament could not be added with the following exception: {ex.Message}");
-            }
+            await RespondAsync($"Tournament {abbreviation} | {name} was successfully removed.");
         }
-    }
-    private static Embed TournamentCreationSuccess()
-    {
-        return new EmbedBuilder()
+        catch (Exception ex)
         {
-            Title = "Your tournament was successfully added to the database.", 
-            Color = Color.Green
-        }.WithCurrentTimestamp().Build();
-    }
-    private static Embed TournamentCreationWarning(IReadOnlyCollection<Tournament> tournaments, string abbreviation)
-    {
-        var embed = new EmbedBuilder()
-        {
-            Description = "Your tournament was added but others were found with this abbreviation.",
-            Color = Color.Gold
-        }.WithCurrentTimestamp();
-        
-        for (var i = 0; i < tournaments.Count; i++)
-        {
-            embed.AddField($"Tournaments found with abbreviation: {abbreviation}", $"**{(i+1).ToString()}:** {tournaments.ElementAt(i).Name}", true);
-            if (i != 0)
-            {
-                embed.Fields.ElementAt(0).Value = string.Concat(embed.Fields.ElementAt(0).Value, $"\n, **{(i + 1).ToString()}:** {tournaments.ElementAt(i).Name}");
-            }
-            if (embed.Fields.Count > 5 && embed.Fields.Count != tournaments.Count)
-            {
-                embed.AddField("Too many tournaments: ", $" {tournaments.Count - embed.Fields.Count} more tournaments were found...", true);
-            }
+            await RespondAsync(
+                $"Your tournament could not be added with the following exception: {ex.Message}");
         }
-        
-        return embed.Build();
-    }
-    private static Embed TournamentCreationFail(Exception ex)
-    {
-        return new EmbedBuilder()
-        {
-            Title = $"Your tournament could not be added with the following exception: {ex.Message}",
-            Color = Color.Red
-        }.WithCurrentTimestamp().Build();
     }
 }
