@@ -1,6 +1,5 @@
 ﻿using Discord.Webhook;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
 using Treviso.AppService.BotFunctions.Services.Interfaces;
 using Treviso.Domain.Sql.Models;
 using Treviso.Domain.Sql.Repositories.Interfaces;
@@ -20,7 +19,7 @@ public class MatchPingService : IMatchPingService
     
     public async Task SendPings(string tournamentId)
     {
-        List<Match> matches = _matchRepository.GetMany(x => x.TournamentId.Equals(new ObjectId(tournamentId))).ToList();
+        List<Match> matches = _matchRepository.GetMany(x => x.TournamentId.Equals(tournamentId)).ToList();
         
         var matchPingsWebhook = new DiscordWebhookClient(_configuration.GetSection("MATCH_PINGS_WEBHOOK_URL").Value);
         var refWebhook = new DiscordWebhookClient(_configuration.GetSection("REF_WEBHOOK_URL").Value);

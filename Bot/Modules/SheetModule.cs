@@ -21,7 +21,7 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
         _tournamentRepository = tournamentRepository;
     }
 
-    [SlashCommand("addReplace", "add or replace sheets associated with a tournament")]
+    [SlashCommand("addreplace", "add or replace sheets associated with a tournament")]
     public async Task AddSheets(string mainSheet, string adminSheet,  string refSheet, string refType, string poolSheet)
     {
         if (!refType.Equals("hitomiv4") || 

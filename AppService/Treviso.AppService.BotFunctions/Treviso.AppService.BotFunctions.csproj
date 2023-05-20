@@ -16,8 +16,6 @@
       <PackageReference Include="Discord.Net.Webhook" Version="3.10.0" />
       <PackageReference Include="Discord.Net.WebSocket" Version="3.10.0" />
       <PackageReference Include="Google.Apis.Sheets.v4" Version="1.60.0.2979" />
-      <PackageReference Include="MongoDB.Driver" Version="2.19.1" />
-      <PackageReference Include="MongoDB.Driver.Core" Version="2.19.1" />
     </ItemGroup>
 
 </Project>

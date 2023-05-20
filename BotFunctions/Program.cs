@@ -1,9 +1,12 @@
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Treviso.AppService.BotFunctions.Services;
 using Treviso.AppService.BotFunctions.Services.Interfaces;
+using Treviso.Domain.Sql.Contexts;
+using Treviso.Domain.Sql.Contexts.Interfaces;
 using Treviso.Domain.Sql.Models;
 using Treviso.Domain.Sql.Repositories;
 using Treviso.Domain.Sql.Repositories.Interfaces;
@@ -22,6 +25,12 @@ public class Program
             {
                 AddAppServices(services, localConfig);
                 services.AddLogging();
+                services.AddDbContextPool<ITrevisoContext, TrevisoContext>(options =>
+                {
+                    options.UseSqlServer(
+                        localConfig.GetConnectionString("TREVISO_CONNECTION" ) ?? throw new NullReferenceException("Could not find treviso connection string"),
+                        sqlServerOptions => sqlServerOptions.CommandTimeout(90));
+                }, 1024);
             })
             .ConfigureFunctionsWorkerDefaults()
             .Build();
@@ -32,12 +41,7 @@ public class Program
     private static void AddAppServices(IServiceCollection services, IConfigurationRoot localConfig)
     {
         services.AddScoped<IMatchRepository, MatchRepository>();
-        services.Configure<MongoSettings>(options =>
-        {
-            options.ConnectionString = localConfig.GetSection("CONNECTION_STRING").Value;
-            options.DatabaseName = localConfig.GetSection("DATABASE_NAME").Value;
-        });
-        services.AddSingleton<MongoSettings>();
+
         services.AddScoped<IMatchPingService, MatchPingService>();
         services.AddSingleton<DiscordSocketClient>();
 

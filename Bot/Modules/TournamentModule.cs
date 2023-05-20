@@ -24,6 +24,8 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
     {
         var newTournament = new Tournament
         {
+            Id = new Guid(),
+            GuildId = Context.Guild.Id,
             Abbreviation = abbreviation,
             Name = name,
             Bws = bws,
@@ -35,9 +37,7 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
             User = Context.User.Id,
             Version = 1
         };
-
-        try
-        {
+        
             List<Tournament> tournaments =
                 _tournamentRepository.GetMany(x => x.Abbreviation.Equals(abbreviation)).ToList();
             
@@ -53,12 +53,8 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
 
                 await RespondAsync(embed: TournamentCreationSuccess());
             }
+            // await RespondAsync(embed: TournamentCreationFail(ex));
         }
-        catch (Exception ex)
-        {
-            await RespondAsync(embed: TournamentCreationFail(ex));
-        }
-    }
 
     [SlashCommand("remove", "removes a tournament from the database")]
     public async Task RemoveTournament(string abbreviation, string name)

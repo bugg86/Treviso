@@ -2,10 +2,12 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Treviso.Domain.Sql.Models;
+using Treviso.Domain.Sql.Contexts;
+using Treviso.Domain.Sql.Contexts.Interfaces;
 using Treviso.Domain.Sql.Repositories;
 using Treviso.Domain.Sql.Repositories.Interfaces;
 
@@ -25,6 +27,14 @@ public class Program
         async void ConfigureDelegate(IServiceCollection services)
         {
             ConfigureServices(services, localConfig);
+            services.AddDbContextPool<ITrevisoContext, TrevisoContext>(options =>
+            {
+                options.UseSqlServer(
+                    localConfig.GetConnectionString("TREVISO_CONNECTION" ) ?? throw new NullReferenceException("Could not find treviso connection string"),
+                    sqlServerOptions => sqlServerOptions.CommandTimeout(90));
+            }, 1024);
+
+            // services.AddLogging();
 
             var serviceProvider = services.BuildServiceProvider();
             _client = serviceProvider.GetRequiredService<DiscordSocketClient>();
@@ -33,7 +43,6 @@ public class Program
             _client.Log += Log;
             _commands.Log += Log;
             _client.Ready += ReadyAsync;
-            
 
             var token = await File.ReadAllTextAsync("../../../bot_token");
 
@@ -58,19 +67,16 @@ public class Program
 
     private void ConfigureServices(IServiceCollection services, IConfigurationRoot localConfig)
     {
+        DiscordSocketConfig config = new()
+        {
+            UseInteractionSnowflakeDate = false
+        };
+        services.AddSingleton(config);
         services.AddSingleton<DiscordSocketClient>();
         services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<SelectionMenuHandler>();
-        
-        services.Configure<MongoSettings>(options =>
-        {
-            options.ConnectionString = localConfig.GetValue<string>("CONNECTION_STRING") ?? "mongodb://localhost:27017";
-            
-            options.DatabaseName = localConfig.GetValue<string>("DATABASE_NAME") ?? "staff-tool";
-        });
-        services.AddSingleton<MongoSettings>();
-        
+
         services.AddScoped<ITournamentRepository, TournamentRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<ISheetRepository, SheetRepository>();

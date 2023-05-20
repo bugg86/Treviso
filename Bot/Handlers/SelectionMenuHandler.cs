@@ -1,8 +1,5 @@
 using Discord.Interactions;
 using Discord.WebSocket;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Treviso.Domain.Sql.Models;
 using Treviso.Domain.Sql.Models;
 using Treviso.Domain.Sql.Repositories.Interfaces;
 
@@ -44,15 +41,15 @@ public class SelectionMenuHandler
         string selection = string.Join(", ", arg.Data.Values);
         string[] ids = selection.Split(';');
 
-        var sheets = _sheetRepository.GetMany(x => x.TournamentId.Equals(new ObjectId(ids[0]))).ToList();
-
-        if (sheets.Any())
-        {
-            foreach (Sheet sheet in sheets)
-            {
-                _sheetRepository.Remove(sheet);
-            }
-        }
+        // var sheets = _sheetRepository.GetMany(x => x.TournamentId.Equals(new ObjectId(ids[0]))).ToList();
+        //
+        // if (sheets.Any())
+        // {
+        //     foreach (Sheet sheet in sheets)
+        //     {
+        //         _sheetRepository.Remove(sheet);
+        //     }
+        // }
 
         // _sheetRepository.Update(filter, updateDefinition);
 

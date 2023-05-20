@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson;
-
-namespace Treviso.Domain.Sql.Models;
+﻿namespace Treviso.Domain.Sql.Models;
 
 public class Match
 {
