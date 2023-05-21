@@ -43,9 +43,9 @@ public class Program
             _client.Log += Log;
             _commands.Log += Log;
             _client.Ready += ReadyAsync;
-
-            var token = localConfig.GetSection("BOT_TOKEN").Value ?? string.Empty;
-
+            
+            var token = await File.ReadAllTextAsync("../../../bot_token");
+            
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
@@ -86,7 +86,7 @@ public class Program
         IConfigurationBuilder localConfigBuilder = new ConfigurationBuilder().AddEnvironmentVariables();
         IConfigurationRoot localConfig = localConfigBuilder.AddJsonFile("local.settings.json", optional: true, reloadOnChange: true).Build();
 
-        // if (localConfig.GetConnectionString("APP_CONFIG") == null) { return localConfig; }
+        if (localConfig.GetConnectionString("APP_CONFIG") == null) { return localConfig; }
 
         return new ConfigurationBuilder()
             .AddConfiguration(localConfig)

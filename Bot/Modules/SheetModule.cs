@@ -1,4 +1,3 @@
-using System.Xml.Schema;
 using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
