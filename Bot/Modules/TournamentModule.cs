@@ -40,46 +40,68 @@ public class TournamentModule : InteractionModuleBase<SocketInteractionContext>
 
         Tournament? tourney = _tournamentRepository.GetSingle(x => x.GuildId.Equals(Context.Guild.Id));
 
-        if (tourney is null)
+        if (tourney is not null)
         {
-            _tournamentRepository.Add(newTournament);
             await RespondAsync(embed: new EmbedBuilder()
             {
-                Title = "Your tournament was successfully added to the database.", 
-                Color = Color.Green
+                Title = "Your tournament could not be added because there is already one associated with the discord.",
+                Color = Color.Red
             }.WithCurrentTimestamp().Build());
-            
+            return;
+        }
+        
+        try
+        {
+            _tournamentRepository.Add(newTournament);
+            _tournamentRepository.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your tournament could not be added with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
             return;
         }
 
         await RespondAsync(embed: new EmbedBuilder()
         {
-            Title = "Your tournament could not be added because there is already one associated with the discord.",
-            Color = Color.Red
+            Title = "Your tournament was successfully added to the database.", 
+            Color = Color.Green
         }.WithCurrentTimestamp().Build());
     }
 
     [SlashCommand("remove", "removes a tournament from the database")]
-    public async Task RemoveTournament(string abbreviation, string name)
+    public async Task RemoveTournament()
     {
         Tournament? tournament = _tournamentRepository.GetSingle(x => x.GuildId.Equals(Context.Guild.Id));
 
         if (tournament is null)
         {
             await RespondAsync("There were no tournaments found associated with this server.");
-            
             return;
         }
+        
         try
         {
             _tournamentRepository.Remove(tournament);
-
-            await RespondAsync($"Tournament {abbreviation} | {name} was successfully removed.");
+            _tournamentRepository.SaveChanges();
         }
         catch (Exception ex)
         {
-            await RespondAsync(
-                $"Your tournament could not be added with the following exception: {ex.Message}");
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your tournament could not be removed with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
         }
+        
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = $"Tournament {tournament.Abbreviation} | {tournament.Name} was successfully removed.", 
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
     }
 }

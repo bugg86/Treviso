@@ -1,3 +1,4 @@
+using System.Xml.Schema;
 using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
@@ -21,52 +22,200 @@ public class SheetModule : InteractionModuleBase<SocketInteractionContext>
         _tournamentRepository = tournamentRepository;
     }
 
-    [SlashCommand("addreplace", "add or replace sheets associated with a tournament")]
-    public async Task AddSheets(string mainSheet, string adminSheet,  string refSheet, string refType, string poolSheet)
+    [SlashCommand("add", "add sheets associated with a tournament")]
+    public async Task AddSheets(string mainSheet = "", string adminSheet = "",  string refSheet = "", string refType = "", string poolSheet = "")
     {
-        if (!refType.Equals("hitomiv4") || 
+        if ((!refType.Equals("hitomiv4") || 
             !refType.Equals("hitomiv5") || 
             !refType.Equals("dioandleo") ||
-            !refType.Equals("icedynamix"))
+            !refType.Equals("icedynamix") ||
+            !refType.Equals("convex")) && refSheet != "")
         {
-            await RespondAsync("You did not enter a valid ref sheet type. The valid types are: hitomiv4, hitomiv5, dioandleo, and icedynamix. Please enter one of these and try again.");
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = "You did not enter a valid ref sheet type. " +
+                        "The valid types are: hitomiv4, hitomiv5, dioandleo, icedynamix, or convex.",
+                Color = Color.Gold
+            }.WithCurrentTimestamp().Build());
             return;
         }
+        
+        if (mainSheet == "" && adminSheet == "" && poolSheet == "" && refSheet == "")
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = "You must include at least one sheet when adding sheets.",
+                Color = Color.Gold
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+
+        Tournament? tourney = await CheckForTournament();
+
+        if (tourney is null) { return; }
+
+        Sheet? sheet = _sheetRepository.GetSingle(x => x.TournamentId.Equals(tourney.Id));
+
+        if (sheet is not null)
+        {
+            await RespondAsync(embed:new EmbedBuilder()
+            {
+                Title = "There are already sheets associated with the tournament in this server. " +
+                        "Please use the update command, or remove the old sheets before adding new ones.",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+
         Sheet newSheets = new Sheet
         {
+            Id = new Guid(),
+            TournamentId = tourney.Id,
             Main = mainSheet,
             Admin = adminSheet,
             Pool = poolSheet,
             Ref = refSheet,
             RefType = refType,
             User = Context.User.Id,
-            Version = 2
+            Version = 1
         };
-
-        _sheetRepository.Add(newSheets);
-
-        var menuBuilder = new SelectMenuBuilder()
-            .WithPlaceholder("Select a tourney")
-            .WithCustomId("tourney-sheet-selection")
-            .WithMinValues(1)
-            .WithMaxValues(1);
-
-        IList<Tournament> tournaments = _tournamentRepository.GetMany(x => !string.IsNullOrEmpty(x.Abbreviation)).ToList();
-
-        if (!tournaments.Any())
+        
+        try
         {
-            await RespondAsync("There are no tournaments to add sheets to.");
-            
+            _sheetRepository.Add(newSheets);
+            _sheetRepository.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your sheets could not be added with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
             return;
         }
 
-        foreach (Tournament tournament in tournaments)
+        await RespondAsync(embed: new EmbedBuilder()
         {
-            //Pass tournament ObjectId and sheet ObjectId through the option custom id
-            menuBuilder.AddOption(label: tournament.Abbreviation, tournament.Id.ToString() + ";" + newSheets.Id.ToString(), description: tournament.Name);
+            Title = "Successfully added sheets to database.",
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
+    }
+    [SlashCommand("remove", "remove sheets associated with tournament/server")]
+    public async Task RemoveSheets()
+    {
+        Tournament? tourney = await CheckForTournament();
+
+        if (tourney is null) { return; }
+
+        Sheet? sheet = _sheetRepository.GetSingle(x => x.TournamentId.Equals(tourney.Id));
+
+        if (sheet is null)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = "There are no sheets to remove.",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
         }
         
-        var builder = new ComponentBuilder().WithSelectMenu(menuBuilder);
-        await ReplyAsync("Pick the tournament to add sheets to:", components: builder.Build());
+        try
+        {
+            _sheetRepository.Remove(sheet);
+            _sheetRepository.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your sheets could not be removed with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "Your sheets were successfully removed.",
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
+    }
+    [SlashCommand("update", "update existing sheets")]
+    public async Task UpdateSheets(string mainSheet = "", string adminSheet = "",  string refSheet = "", string refType = "", string poolSheet = "")
+    {
+        Tournament? tourney = await CheckForTournament();
+
+        if (tourney is null) { return; }
+        
+        if ((!refType.Equals("hitomiv4") || 
+             !refType.Equals("hitomiv5") || 
+             !refType.Equals("dioandleo") ||
+             !refType.Equals("icedynamix") ||
+             !refType.Equals("convex") ||
+             refType.Equals("")) && refSheet != "")
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = "You did not enter a valid ref sheet type. " +
+                        "The valid types are: hitomiv4, hitomiv5, dioandleo, icedynamix, or convex.",
+                Color = Color.Gold
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+
+        Sheet? oldSheet = _sheetRepository.GetSingle(x => x.TournamentId.Equals(tourney.Id));
+
+        if (oldSheet is null)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = "There are no sheets to update.",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+
+        try
+        {
+            oldSheet.Main = string.IsNullOrEmpty(mainSheet) ? oldSheet.Main : mainSheet;
+            oldSheet.Admin = string.IsNullOrEmpty(adminSheet) ? oldSheet.Admin : adminSheet;
+            oldSheet.Pool = string.IsNullOrEmpty(poolSheet) ? oldSheet.Pool : poolSheet;
+            oldSheet.Ref = string.IsNullOrEmpty(refSheet) ? oldSheet.Ref : refSheet;
+            oldSheet.RefType = string.IsNullOrEmpty(refType) ? oldSheet.RefType : refType;
+            oldSheet.User = Context.User.Id;
+
+            _sheetRepository.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your sheets could not be updated with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "Your sheets were successfully updated.",
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
+    }
+
+    private async Task<Tournament?> CheckForTournament()
+    {
+        Tournament? tourney = _tournamentRepository.GetSingle(x => x.GuildId.Equals(Context.Guild.Id));
+
+        if (tourney is not null) { return tourney; }
+        
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "There is no tournament associated with this server.",
+            Color = Color.Red
+        }.WithCurrentTimestamp().Build());
+        
+        return null;
     }
 }

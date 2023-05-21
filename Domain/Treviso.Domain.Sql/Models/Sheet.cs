@@ -3,7 +3,7 @@ namespace Treviso.Domain.Sql.Models;
 public class Sheet
 {
     public Guid Id { get; set; }
-    public Guid? TournamentId { get; set; }
+    public Guid TournamentId { get; set; }
     public string Main { get; set; }
     public string Ref { get; set; }
     public string RefType { get; set; }
