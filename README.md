@@ -20,3 +20,7 @@ This app can be used to help manage tournaments.
 * Store mappool data
 * Command to ingest mappool data from connected mappool sheet
 * Automatically ingest connected mappool sheet data periodically
+
+### How to build and run app
+
+Idk I'll probably add a docker file eventually :skull:
