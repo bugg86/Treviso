@@ -1,6 +1,7 @@
 ﻿using Bot.Handlers;
 using Discord;
 using Discord.Interactions;
+using Microsoft.Extensions.Configuration;
 using Treviso.Domain.Sql.Models;
 using Treviso.Domain.Sql.Repositories.Interfaces;
 
@@ -12,29 +13,42 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
     public InteractionService Commands { get; set; } = null!;
     public CommandHandler _handler;
     private readonly IMatchRepository _matchRepository;
-    
-    public MatchModule(CommandHandler handler, IMatchRepository matchRepository)
+    private readonly ITournamentRepository _tournamentRepository;
+    private readonly IConfiguration _configuration;
+
+    public MatchModule(CommandHandler handler, IMatchRepository matchRepository, ITournamentRepository tournamentRepository, IConfiguration configuration)
     {
         _handler = handler;
         _matchRepository = matchRepository;
+        _tournamentRepository = tournamentRepository;
+        _configuration = configuration;
     }
 
     [SlashCommand("add", "command to add a match to database")]
-    public async Task AddMatch(string matchId, string abbreviation, string round,
-        string? date = null,
-        string? time = null, 
-        string? team1 = null, 
-        string? captainDiscord1 = null, 
-        string? team2 = null, 
-        string? captainDiscord2 = null, 
-        string? referee = null, 
-        string? refereeDiscord = null,
-        string? streamer = null,
-        string? commentator1 = null, 
-        string? commentator2 = null)
+    public async Task AddMatch
+    (
+        string matchId, string round,
+        string date = "",
+        string time = "", 
+        string team1 = "", 
+        string captainDiscord1 = "", 
+        string team2 = "", 
+        string captainDiscord2 = "", 
+        string referee = "", 
+        string refereeDiscord = "",
+        string streamer = "",
+        string commentator1 = "", 
+        string commentator2 = ""
+    )
     {
-        var newMatch = new Match
+        Tournament? tourney = await CheckForTournament();
+
+        if (tourney is null) { return; }
+        
+        Match newMatch = new Match
         {
+            Id = new Guid(),
+            TournamentId = tourney.Id,
             MatchId = matchId,
             Round = round,
             Date = date,
@@ -54,58 +68,159 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             Version = 1
         };
 
+        Match? tempMatch = _matchRepository.GetSingle(x => x.MatchId.Equals(matchId));
+
+        if (tempMatch is not null)
+        {
+            new EmbedBuilder()
+            {
+                Title = $"A match with id of {matchId} already exists.",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build();
+            return;
+        }
+
         try
         {
-            List<Match> match = _matchRepository.GetMany(x =>
-                x.MatchId.Equals(matchId)).ToList();
-            if (match.Count == 1)
-            {
-                await RespondAsync(embed: MatchCreationExists(matchId, abbreviation));
-
-                return;
-            }
             _matchRepository.Add(newMatch);
-            
-            await RespondAsync(embed: MatchCreationSuccess());
+            _matchRepository.SaveChanges();
         }
         catch (Exception ex)
         {
-            await RespondAsync(embed: MatchCreationFail(ex));
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your match could not be added with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
         }
+        
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "Your match was successfully added to the database.",
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
     }
 
     [SlashCommand("remove", "command to remove match from database")]
-    public async Task RemoveMatch(string matchId, string abbreviation)
+    public async Task RemoveMatch(string matchId)
     {
+        Tournament? tourney = await CheckForTournament();
+
+        if (tourney is null) { return; }
+        
+        Match? match = _matchRepository.GetSingle(x => x.MatchId.Equals(matchId));
+
+        if (match is null)
+        {
+            new EmbedBuilder()
+            {
+                Title = $"A match with id of {matchId} does not exist.",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build();
+            return;
+        }
+        
         try
         {
-            List<Match> match = _matchRepository.GetMany(x => x.MatchId.Equals(matchId)).ToList();
-
-            if (match.Count == 0)
-            {
-                await RespondAsync(embed: MatchRemovalNone());
-            }
-            // else
-            // {
-            //     _matchRepository.Remove(x => x.MatchId == matchId && x.Abbreviation == abbreviation);
-            //     
-            //     await RespondAsync(embed: MatchRemovalSuccess(matchId, abbreviation));
-            // }
+            _matchRepository.Remove(match);
+            _matchRepository.SaveChanges();
         }
         catch (Exception ex)
         {
-            await RespondAsync(embed: MatchRemovalException(ex));
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your match could not be removed with the following exception: {ex.Message}",
+                Color = Color.DarkRed
+            }.WithCurrentTimestamp().Build());
+            return;
         }
+        
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = $"Match ID: {matchId} for tournament: {tourney.Abbreviation} was successfully removed.",
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
     }
+    [SlashCommand("update", "update match data")]
+    public async Task UpdateMatch
+    (
+        string matchId,
+        string? round = null,
+        string? date = null,
+        string? time = null, 
+        string? team1 = null, 
+        string? captainDiscord1 = null, 
+        string? team2 = null, 
+        string? captainDiscord2 = null, 
+        string? referee = null, 
+        string? refereeDiscord = null,
+        string? streamer = null,
+        string? commentator1 = null, 
+        string? commentator2 = null,
+        bool? pingSent = null,
+        bool? matchFinished = null
+    )
+    {
+        Tournament? tourney = await CheckForTournament();
 
+        if (tourney is null) { return; }
+        
+        Match? oldMatch = _matchRepository.GetSingle(x => x.MatchId.Equals(matchId));
+
+        if (oldMatch is null)
+        {
+            new EmbedBuilder()
+            {
+                Title = $"A match with id of {matchId} does not exist.",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build();
+            return;
+        }
+
+        try
+        {
+            oldMatch.Round = round ?? oldMatch.Round;
+            oldMatch.Date = date ?? oldMatch.Date;
+            oldMatch.Time = time ?? oldMatch.Time;
+            oldMatch.Team1 = team1 ?? oldMatch.Team1;
+            oldMatch.CaptainDiscord1 = captainDiscord1 ?? oldMatch.CaptainDiscord1;
+            oldMatch.Team2 = team2 ?? oldMatch.Team2;
+            oldMatch.CaptainDiscord2 = captainDiscord2 ?? oldMatch.CaptainDiscord2;
+            oldMatch.Referee = referee ?? oldMatch.Referee;
+            oldMatch.RefereeDiscord = refereeDiscord ?? oldMatch.RefereeDiscord;
+            oldMatch.Streamer = streamer ?? oldMatch.Streamer;
+            oldMatch.Commentator1 = commentator1 ?? oldMatch.Commentator1;
+            oldMatch.Commentator2 = commentator2 ?? oldMatch.Commentator2;
+            oldMatch.PingSent = pingSent ?? oldMatch.PingSent;
+            oldMatch.MatchFinished = matchFinished ?? oldMatch.MatchFinished;
+
+            _matchRepository.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            await RespondAsync(embed: new EmbedBuilder()
+            {
+                Title = $"Your match could not be updated with the following exception: {ex.Message}",
+                Color = Color.Red
+            }.WithCurrentTimestamp().Build());
+            return;
+        }
+        
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "Your match was successfully updated.",
+            Color = Color.Green
+        }.WithCurrentTimestamp().Build());
+    }
     [SlashCommand("ping", "command to test match pings")]
     public async Task PingMatch(string matchId, string abbreviation)
     {
         try
         {
-            var matchPingChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../match-ping-channel-id")));
-            var refChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../ref-channel-id")));
-            var streamerChannel = Context.Guild.GetTextChannel(ulong.Parse(await File.ReadAllTextAsync("../../../streamer-channel-id")));
+            var matchPingChannel = Context.Guild.GetTextChannel(ulong.Parse(_configuration.GetSection("MATCH_PINGS_CHANNEL_ID").Value ?? string.Empty));
+            var refChannel = Context.Guild.GetTextChannel(ulong.Parse(_configuration.GetSection("REF_CHANNEL_ID").Value ?? string.Empty));
+            var streamerChannel = Context.Guild.GetTextChannel(ulong.Parse(_configuration.GetSection("STREAMER_CHANNEL_ID").Value ?? string.Empty));
             
             var match = _matchRepository.GetSingle(x => x.MatchId.Equals(matchId));
 
@@ -146,6 +261,20 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
             await RespondAsync(embed: MatchPingFail());
         }
     }
+    private async Task<Tournament?> CheckForTournament()
+    {
+        Tournament? tourney = _tournamentRepository.GetSingle(x => x.GuildId.Equals(Context.Guild.Id));
+
+        if (tourney is not null) { return tourney; }
+        
+        await RespondAsync(embed: new EmbedBuilder()
+        {
+            Title = "There is no tournament associated with this server.",
+            Color = Color.Red
+        }.WithCurrentTimestamp().Build());
+        
+        return null;
+    }
     private static string CreateMatchPing(Match match)
     {
         return $"{match.Round} match ``{match.MatchId}`` between ``{match.Team1}``" +
@@ -159,58 +288,6 @@ public class MatchModule : InteractionModuleBase<SocketInteractionContext>
         {
             Title = "Could not create ping, match likely does not exist.",
             Color = Color.Red
-        }.WithCurrentTimestamp().Build();
-    }
-    private static Embed MatchCreationSuccess()
-    {
-        return new EmbedBuilder()
-        {
-            Title = "Your match was successfully added to the database.",
-            Color = Color.Green
-        }.WithCurrentTimestamp().Build();
-    }
-
-    private static Embed MatchCreationExists(string matchId, string abbreviation)
-    {
-        return new EmbedBuilder()
-        {
-            Title = $"A match with id: {matchId} already exists for tournament: {abbreviation}.",
-            Color = Color.Gold
-        }.WithCurrentTimestamp().Build();
-    }
-    private static Embed MatchCreationFail(Exception ex)
-    {
-        return new EmbedBuilder()
-        {
-            Title = $"Your match could not be added with the following exception: {ex.Message}",
-            Color = Color.Red
-        }.WithCurrentTimestamp().Build();
-    }
-
-    private static Embed MatchRemovalSuccess(string matchId, string abbreviation)
-    {
-        return new EmbedBuilder()
-        {
-            Title = $"Match ID: {matchId} for tournament: {abbreviation} was successfully removed.",
-            Color = Color.Green
-        }.WithCurrentTimestamp().Build();
-    }
-    private static Embed MatchRemovalNone()
-    {
-        return new EmbedBuilder()
-        {
-            Title = "Your match could not be found, check your parameters and try again.",
-            Color = Color.Gold
-        }.WithCurrentTimestamp().Build();
-    }
-    private static Embed MatchRemovalException(Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        
-        return new EmbedBuilder()
-        {
-            Title = $"Your match could not be removed with the following exception: {ex.Message}",
-            Color = Color.DarkRed
         }.WithCurrentTimestamp().Build();
     }
 }

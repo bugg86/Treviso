@@ -44,7 +44,7 @@ public class Program
             _commands.Log += Log;
             _client.Ready += ReadyAsync;
 
-            var token = await File.ReadAllTextAsync("../../../bot_token");
+            var token = localConfig.GetSection("BOT_TOKEN").Value ?? string.Empty;
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
