@@ -2,9 +2,9 @@
 This app can be used to help manage tournaments.
 
 ### Planned features are as follows:
-* Commands to add, remove and update tournament data
-* Commands to add, remove and update sheets
-* Commands to add, remove and update matches
+* (DONE) Commands to add, remove and update tournament data
+* (DONE) Commands to add, remove and update sheets
+* (DONE) Commands to add, remove and update matches
 * Commands to add, remove and update qualifier matches
 * Command to ingest connected ref sheet data
 * Automatically ingest connected ref sheet data periodically
